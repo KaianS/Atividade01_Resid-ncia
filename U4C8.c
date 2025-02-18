@@ -52,11 +52,21 @@ int16_t adjust_joystick_value(int16_t raw, int16_t center) {
 
 // Alterna o estado do LED verde e da borda no display
 void toggle_led_border(uint pin, uint32_t events) {
-    sys_state.green_led_state = !sys_state.green_led_state;  // Inverte estado do LED verde
-    gpio_put(LED_G, sys_state.green_led_state);  // Atualiza LED verde
-    sys_state.border_state = !sys_state.border_state;  // Inverte estado da borda
+    static uint32_t last_press_time = 0;
+    uint32_t current_time = to_ms_since_boot(get_absolute_time());
+
+    // Evita acionamentos múltiplos rápidos (debounce de 200ms)
+    if (current_time - last_press_time < 200) {
+        return;
+    }
+    last_press_time = current_time;
+
+    sys_state.green_led_state = !sys_state.green_led_state;
+    gpio_put(LED_G, sys_state.green_led_state);
+    sys_state.border_state = !sys_state.border_state;
     printf("Botão do joystick pressionado: Borda=%d, LED Verde=%d\n", sys_state.border_state, sys_state.green_led_state);
 }
+
 
 // Alterna o estado dos LEDs PWM
 void toggle_pwm_leds(uint pin, uint32_t events) {
@@ -114,9 +124,11 @@ void setup_hardware() {
     gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
     gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
     gpio_pull_up(SDA_PIN);
-    gpio_pull_up(SCL_PIN);
-    ssd1306_init(&sys_state.display, 128, 64, false, OLED_ADDR, I2C_PORT);
-    ssd1306_config(&sys_state.display);
+    gpio_pull_up(SCL_PIN); 
+    ssd1306_init(&sys_state.display, 128, 64, false, OLED_ADDR, I2C_PORT); 
+    ssd1306_config(&sys_state.display); 
+
+    sys_state.pwm_led_state = true; 
 }
 
 // Atualiza a exibição do display OLED
