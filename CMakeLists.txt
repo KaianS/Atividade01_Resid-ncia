@@ -45,7 +45,7 @@ pico_generate_pio_header(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}/ws2818b.pio
 )
 
-pico_set_program_name(${PROJECT_NAME} "U4C8")
+pico_set_program_name(${PROJECT_NAME} "ATIVIDADE01RESIDENCIA")
 pico_set_program_version(${PROJECT_NAME} "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
